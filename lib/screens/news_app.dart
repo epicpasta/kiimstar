@@ -64,37 +64,44 @@ class _NewsAppState extends State<NewsApp> {
                           fontSize: 22,
                         ),
                       ),
-                      DropdownButton(
-                          value: category,
-                          items: categoryList
-                              .map<DropdownMenuItem<String>>((String newValue) {
-                            return DropdownMenuItem<String>(
-                              value: newValue,
-                              child: Text(newValue.toUpperCase()),
-                            );
-                          }).toList(),
-                          onChanged: (newValue) {
-                            setState(() {
-                              category = newValue;
-                            });
-                          }),
-                      DropdownButton(
-                        value: country,
-                        items: countryCode.map<DropdownMenuItem<String>>(
-                          (String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value.toUpperCase()),
+                      Expanded(
+                        child: DropdownButton(
+                            value: category,
+                            items: categoryList.map<DropdownMenuItem<String>>(
+                                (String newValue) {
+                              return DropdownMenuItem<String>(
+                                value: newValue,
+                                child: Text(newValue.toUpperCase()),
+                              );
+                            }).toList(),
+                            onChanged: (newValue) {
+                              setState(() {
+                                category = newValue;
+                              });
+                            }),
+                      ),
+                      SizedBox(
+                        width: 3,
+                      ),
+                      Expanded(
+                        child: DropdownButton(
+                          value: country,
+                          items: countryCode.map<DropdownMenuItem<String>>(
+                            (String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value.toUpperCase()),
+                              );
+                            },
+                          ).toList(),
+                          onChanged: (value) {
+                            setState(
+                              () {
+                                country = value;
+                              },
                             );
                           },
-                        ).toList(),
-                        onChanged: (value) {
-                          setState(
-                            () {
-                              country = value;
-                            },
-                          );
-                        },
+                        ),
                       ),
                     ],
                   ),
