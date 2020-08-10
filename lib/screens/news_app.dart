@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kiimstar/screens/search_screen.dart';
 import 'package:kiimstar/utilities/constants.dart';
 import 'package:kiimstar/utilities/lists.dart';
 import 'package:kiimstar/utilities/news.dart';
@@ -12,26 +13,31 @@ class NewsApp extends StatefulWidget {
 
 class _NewsAppState extends State<NewsApp> {
   NewsData newsData = NewsData();
-  String country = 'us';
+  String country = 'ng';
   String category = 'general';
+  String query = '';
+  int page = 1;
 
   Future<List<News>> getNews() async {
-    var newsDataDecoded = await newsData.getNewsData(country, category);
+    var newsDataDecoded =
+        await newsData.getNewsData(country, category, page, query);
     List<News> newsList = [];
     if (newsDataDecoded != null) {
-      for (var i = 0; i < newsDataDecoded['articles'].length; i++) {
-        // setState(() {
-        News news = News(
-          heading: newsDataDecoded['articles'][i]['title'].toUpperCase(),
-          description: newsDataDecoded['articles'][i]['description'],
-          source: newsDataDecoded['articles'][i]['source']['name'],
-          time: newsDataDecoded['articles'][i]['publishedAt'],
-          imageURL: newsDataDecoded['articles'][i]['urlToImage'],
-          sourceURl: newsDataDecoded['articles'][i]['url'],
-        );
+      if (newsDataDecoded['articles'].length > 0) {
+        for (var i = 0; i < newsDataDecoded['articles'].length; i++) {
+          News news = News(
+            heading: newsDataDecoded['articles'][i]['title'].toUpperCase(),
+            description: newsDataDecoded['articles'][i]['description'],
+            source: newsDataDecoded['articles'][i]['source']['name'],
+            time: newsDataDecoded['articles'][i]['publishedAt'],
+            imageURL: newsDataDecoded['articles'][i]['urlToImage'],
+            sourceURl: newsDataDecoded['articles'][i]['url'],
+          );
 
-        newsList.add(news);
-        // });
+          newsList.add(news);
+        }
+      } else {
+        return null;
       }
     }
     return newsList;
@@ -40,105 +46,165 @@ class _NewsAppState extends State<NewsApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Kiimstar! Real News',
+          style: TextStyle(
+            color: kSecAppColour,
+            fontSize: 30,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        backgroundColor: kMainAppColour,
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () async {
+                var popVariable = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SearchScreen()),
+                );
+                if (popVariable != null) {
+                  setState(() {
+                    query = popVariable;
+                  });
+                }
+              })
+        ],
+      ),
       backgroundColor: kMainAppColour,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Container(
-            padding: EdgeInsets.only(top: 50, left: 16, right: 16),
             child: Column(
               children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Text(
-                        'Kiimstar! Real News',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 22,
-                        ),
-                      ),
-                      Expanded(
-                        child: DropdownButton(
-                            value: category,
-                            items: categoryList.map<DropdownMenuItem<String>>(
-                                (String newValue) {
-                              return DropdownMenuItem<String>(
-                                value: newValue,
-                                child: Text(newValue.toUpperCase()),
-                              );
-                            }).toList(),
-                            onChanged: (newValue) {
-                              setState(() {
-                                category = newValue;
-                              });
-                            }),
-                      ),
-                      SizedBox(
-                        width: 3,
-                      ),
-                      Expanded(
-                        child: DropdownButton(
-                          value: country,
-                          items: countryCode.map<DropdownMenuItem<String>>(
-                            (String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value.toUpperCase()),
-                              );
-                            },
-                          ).toList(),
-                          onChanged: (value) {
-                            setState(
-                              () {
-                                country = value;
-                              },
-                            );
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    DropdownButton(
+                        style: TextStyle(color: kSecAppColour),
+                        dropdownColor: kMainAppColour,
+                        value: category,
+                        items: categoryList
+                            .map<DropdownMenuItem<String>>((String newValue) {
+                          return DropdownMenuItem<String>(
+                            value: newValue,
+                            child: Text(newValue.toUpperCase()),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          setState(() {
+                            category = newValue;
+                          });
+                        }),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    DropdownButton(
+                      style: TextStyle(color: kSecAppColour),
+                      dropdownColor: kMainAppColour,
+                      value: country,
+                      items: countryCode.map<DropdownMenuItem<String>>(
+                        (String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value.toUpperCase()),
+                          );
+                        },
+                      ).toList(),
+                      onChanged: (value) {
+                        setState(
+                          () {
+                            country = value;
                           },
-                        ),
-                      ),
-                    ],
-                  ),
+                        );
+                      },
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    Text(
+                      'Page: $page',
+                      style: kInfoTextStyle,
+                    )
+                  ],
                 ),
               ],
             ),
           ),
           SizedBox(
-            height: 30,
+            height: 8,
           ),
           Expanded(
             child: Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 5,
-              ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+                  topRight: Radius.circular(40),
+                  topLeft: Radius.circular(40),
                 ),
-                color: Colors.white,
+                color: kMainAppColour,
               ),
-              child: FutureBuilder(
-                future: getNews(),
-                builder: (context, AsyncSnapshot<List<News>> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(
-                      child: Container(
-                        child: Text('Loading...'),
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: FutureBuilder(
+                      future: getNews(),
+                      builder: (context, AsyncSnapshot<List<News>> snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: Container(
+                              child: Text(
+                                'Loading...',
+                                style: kInfoTextStyle,
+                              ),
+                            ),
+                          );
+                        }
+                        return NewsFeedBuilder(
+                          snapshot: snapshot,
+                        );
+                      },
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      RaisedButton(
+                          child: Text('Prev Page'),
+                          onPressed: () {
+                            setState(() {
+                              if (page == 1) {
+                                return;
+                              } else {
+                                page--;
+                              }
+                            });
+                          }),
+                      SizedBox(
+                        width: 10,
                       ),
-                    );
-                  }
-                  return NewsFeedBuilder(
-                    snapshot: snapshot,
-                  );
-                },
+                      RaisedButton(
+                          child: Text('Reset'),
+                          onPressed: () {
+                            setState(() {
+                              query = '';
+                              page = 1;
+                            });
+                          }),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      RaisedButton(
+                          child: Text('Next Page'),
+                          onPressed: () {
+                            setState(() {
+                              page++;
+                            });
+                          }),
+                    ],
+                  )
+                ],
               ),
             ),
           )

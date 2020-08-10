@@ -5,8 +5,6 @@ import 'package:kiimstar/screens/webscreen.dart';
 
 class NewsFeedBuilder extends StatelessWidget {
   final AsyncSnapshot<List<News>> snapshot;
-  final String noImageURL =
-      'https://st4.depositphotos.com/17828278/24401/v/450/depositphotos_244011872-stock-illustration-image-vector-symbol-missing-available.jpg';
 
   NewsFeedBuilder({this.snapshot});
 
@@ -31,7 +29,7 @@ class NewsFeedBuilder extends StatelessWidget {
             padding: EdgeInsets.all(15),
             margin: EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: kMainAppColour,
+              color: kSecAppColour,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -61,11 +59,11 @@ class NewsFeedBuilder extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       snapshot.data[index].source ?? ' ',
-                      style: kInfoTextStyle,
+                      style: kBottomTextStyle,
                     ),
                     Text(
                       snapshot.data[index].time ?? ' ',
-                      style: kInfoTextStyle,
+                      style: kBottomTextStyle,
                     ),
                   ],
                 )
