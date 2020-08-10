@@ -8,8 +8,6 @@ A simple news app made with flutter. News Api from newsapi.org
 - Tapping on a news story opens its source website in webview.
 - Loading text while waiting for data to be loaded.
 - Drop down menu for selecting news category and country
-
-## Features To Be Added
 - Functionality to enable searching for stories
 
 
